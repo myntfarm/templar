@@ -70,8 +70,8 @@ def install_rust() -> bool:
     logger.info("*** Installing Rust")
 
     # Update package lists and install dependencies
-    subprocess.run(["sudo", "apt-get", "update"], check=True)
     try:
+        subprocess.run(["sudo", "apt-get", "update"], check=True)
         subprocess.run([
             "sudo", "apt-get", "install", "-y",
             "cmake", "pkg-config", "libssl-dev", "git",
@@ -80,6 +80,7 @@ def install_rust() -> bool:
         ], check=True)
     except subprocess.CalledProcessError as e:
         logger.error(f"Issue with install command trying without sudo...{e}")
+        subprocess.run(["apt-get", "update"], check=True)
         subprocess.run([
             "apt-get", "install", "-y",
             "cmake", "pkg-config", "libssl-dev", "git",
