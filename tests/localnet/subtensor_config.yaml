@@ -1,0 +1,11 @@
+authorityNodes:
+  - base-path: /tmp/alice
+    subtensor_port: 30334
+    subtensor_rpc_port: 9944
+    subtensor_flags: "--alice --validator --rpc-cors=all --allow-private-ipv4 --discover-local --unsafe-force-node-key-generation"
+  - base-path: /tmp/bob
+    subtensor_port: 30335
+    subtensor_rpc_port: 9945
+    subtensor_flags: "--bob --validator --rpc-cors=all --allow-private-ipv4 --discover-local --unsafe-force-node-key-generation"
+
+binaryFeatures: "pow-faucet"

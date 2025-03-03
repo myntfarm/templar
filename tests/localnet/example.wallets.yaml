@@ -1,0 +1,30 @@
+# funding in rao
+# 1000000000 = 1 tao
+
+Admin:
+  wallet:
+    - wallet_name: "Admin"
+      coldkey_secretPhrase: "cold key seed"
+      hotkey_name: "AdminHot"
+      hotkey_secretPhrase: "hotkey seed"
+
+Validators:
+  wallet:
+    - wallet_name: "Validator"
+      coldkey_secretPhrase: "Validator seed"
+      hotkey_name: "ValidatorHot"
+      hotkey_secretPhrase: "hotkey seed"
+      init_funding: 1101000000000 # 1101 Tao
+
+Miners:
+  wallet:
+    - wallet_name: "Miner1"
+      coldkey_secretPhrase: "Miner1 seed"
+      hotkey_name: "Miner1Hot"
+      hotkey_secretPhrase: "hotkey seed"
+      init_funding: 1000000000000 # 1000 Tao
+    - wallet_name: "Miner2"
+      coldkey_secretPhrase: "Miner2 seed"
+      hotkey_name: "Miner2Hot"
+      hotkey_secretPhrase: "hotkey seed"
+      init_funding: 1000000000000 # 1000 Tao

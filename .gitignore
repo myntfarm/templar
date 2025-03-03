@@ -75,3 +75,7 @@ test_output.txt
 neurons/validator_old.py
 model_state.pt
 influxdb_data/
+tests/localnet/wallets.yaml
+tests/localnet/repo_store
+tests/localnet/.dependancy_installed_flag
+tests/localnet/wallets
