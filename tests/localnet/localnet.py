@@ -71,34 +71,34 @@ def install_rust() -> bool:
 
     # Update package lists and install dependencies
     try:
-        subprocess.run(["sudo", "apt-get", "update"], check=True)
+        subprocess.run(["sudo", "apt-get", "update"], shell=True, check=True)
         subprocess.run([
             "sudo", "apt-get", "install", "-y",
             "cmake", "pkg-config", "libssl-dev", "git",
             "gcc", "build-essential", "clang", "libclang-dev",
             "protobuf-compiler", "rustc", ""
-        ], check=True)
+        ], check=True, shell=True)
     except subprocess.CalledProcessError as e:
         logger.error(f"Issue with install command trying without sudo...{e}")
-        subprocess.run(["apt-get", "update"], check=True)
+        subprocess.run(["apt-get", "update"], check=True, shell=True)
         subprocess.run([
             "apt-get", "install", "-y",
             "cmake", "pkg-config", "libssl-dev", "git",
             "gcc", "build-essential", "clang", "libclang-dev",
             "protobuf-compiler", "rustc", ""
-        ], check=True)
+        ], check=True, shell=True)
 
     # Configure Rust
-    subprocess.run(["rustup", "default", "stable"], check=True)
-    subprocess.run(["rustup", "update"], check=True)
+    subprocess.run(["rustup", "default", "stable"], check=True, shell=True)
+    subprocess.run(["rustup", "update"], check=True, shell=True)
     subprocess.run([
         "rustup", "target", "add",
         "wasm32-unknown-unknown"
-    ], check=True)
+    ], check=True, shell=True)
     subprocess.run([
         "rustup", "toolchain", "install",
         "nightly"
-    ], check=True)
+    ], check=True, shell=True)
     subprocess.run([
         "rustup", "target", "add",
         "--toolchain", "nightly", "wasm32-unknown-unknown"
@@ -106,7 +106,7 @@ def install_rust() -> bool:
     subprocess.run([
         "rustup", "component", "add", "rust-src", 
         "--toolchain", "stable-x86_64-unknown-linux-gnu"
-    ], check=True)
+    ], check=True, shell=True)
 
     logger.info("*** Rust installation complete")
 
