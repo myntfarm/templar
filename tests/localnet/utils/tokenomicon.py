@@ -2,7 +2,6 @@
 
 import yaml
 import subprocess
-import psutil
 import torch
 from math import ceil
 from pathlib import Path
@@ -33,12 +32,13 @@ def calculate_faucet_calls(init_funding):
 def admin_funding(config: dict, num_calls: int) -> None:
     admin_wallet = open_wallet()["wallet"][0]
     rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
-    logger.info("CUDA is available:", torch.cuda.is_available())
-    if not torch.cuda.is_available():
-        processing_power = f"--processors {str(ceil(psutil.cpu_count()*.80))}"
-    else:
-        processing_power = "--use-cuda"
-    cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -p ./wallets {processing_power} --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
+    try:
+        if torch.cuda.device_count() > 0:
+            cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --use-cuda --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
+        else:
+            cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
+    except:
+        cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
     subprocess.run(cmd, shell=True, check=True)
 
 def transfer_funds(rpc_port, wallet_info, amount):

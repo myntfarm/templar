@@ -153,7 +153,7 @@ def build_binary(base_dir, features):
     """Build substrate binary with specified features."""
     try:
         logger.info("Building substrate binary...")
-        build_cmd = f'cargo build --workspace --profile=release --features "{features}" --manifest-path ./{base_dir}/Cargo.toml'
+        build_cmd = f"cargo build --workspace --profile=release --features \"{features}\" --manifest-path ./{base_dir}/Cargo.toml"
         subprocess.run(build_cmd, shell=True, check=True)
         logger.info("Binary compiled successfully")
         return True
