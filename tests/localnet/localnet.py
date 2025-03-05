@@ -72,7 +72,7 @@ def install_rust() -> bool:
     # Update package lists and install dependencies
 
     subprocess.run(("apt-get update"), check=True, shell=True)
-    subprocess.run(("apt-get install -y curl cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler "), check=True, shell=True)
+    subprocess.run(("apt-get install -y curl cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler"), check=True, shell=True)
     subprocess.run(("curl https://sh.rustup.rs -sSf | sh -s -- -y"), check=True, shell=True)
     subprocess.run(("source \"$HOME/.cargo/env\""), shell=True)
     

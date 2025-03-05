@@ -43,8 +43,7 @@ dev = [
     "pytest-xdist",
     "bittensor-cli",
     "bittensor-wallet",
-    "pyyaml",
-    "cubit"
+    "pyyaml"
 
 ]
 
