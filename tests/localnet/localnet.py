@@ -76,9 +76,11 @@ def install_rust() -> bool:
         "apt-get", "install", "-y",
         "cmake", "pkg-config", "libssl-dev", "git",
         "gcc", "build-essential", "clang", "libclang-dev",
-        "protobuf-compiler", "rustc", ""
+        "protobuf-compiler", ""
     ], check=True, shell=True)
 
+    subprocess.run(["curl", "https://sh.rustup.rs", "-sSf", "|", "sh", "-s", "--", "-y", ""], check=True, shell=True)
+    
     # Configure Rust
     subprocess.run(["rustup", "default", "stable"], check=True, shell=True)
     subprocess.run(["rustup", "update"], check=True, shell=True)
