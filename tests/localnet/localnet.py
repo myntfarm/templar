@@ -70,23 +70,14 @@ def install_rust() -> bool:
     logger.info("*** Installing Rust")
 
     # Update package lists and install dependencies
-    try:
-        subprocess.run(["sudo", "apt-get", "update"], shell=True, check=True)
-        subprocess.run([
-            "sudo", "apt-get", "install", "-y",
-            "cmake", "pkg-config", "libssl-dev", "git",
-            "gcc", "build-essential", "clang", "libclang-dev",
-            "protobuf-compiler", "rustc", ""
-        ], check=True, shell=True)
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Issue with install command trying without sudo...{e}")
-        subprocess.run(["apt-get", "update"], check=True, shell=True)
-        subprocess.run([
-            "apt-get", "install", "-y",
-            "cmake", "pkg-config", "libssl-dev", "git",
-            "gcc", "build-essential", "clang", "libclang-dev",
-            "protobuf-compiler", "rustc", ""
-        ], check=True, shell=True)
+
+    subprocess.run(["apt-get", "update"], check=True, shell=True)
+    subprocess.run([
+        "apt-get", "install", "-y",
+        "cmake", "pkg-config", "libssl-dev", "git",
+        "gcc", "build-essential", "clang", "libclang-dev",
+        "protobuf-compiler", "rustc", ""
+    ], check=True, shell=True)
 
     # Configure Rust
     subprocess.run(["rustup", "default", "stable"], check=True, shell=True)
@@ -548,7 +539,6 @@ def launch_subtensor_nodes(
     logger.info("Subtensors Launched. Waiting 5 seconds for chain to become active.")
     time.sleep(5)
     
-
 def launch_subtensor(
     base_dir: str,
     script_dir: str,
@@ -574,7 +564,6 @@ def launch_subtensor(
     
     # Launch nodes and track processes
     launch_subtensor_nodes(base_dir, authority_nodes, spec_path)
-
 
 def manage_chain_state(purge):
     """Manage chain state and cleanup."""
@@ -606,10 +595,24 @@ def manage_chain_state(purge):
                 else:
                     logger.error(f"The directory '{chainstate}' does not exist")
 
+
+def check_sudo_access():
+    """Check if the script is running with sudo/root privileges."""
+    if os.geteuid() == 0:
+        print("Running as root or with sudo access.")
+        return True
+    else:
+        print("Please run this script as root or using sudo.")
+        sys.exit(1)
+        return False
+
+
 def main():
     args = parse_args()
     dependancy_flag_file = Path("./.dependancy_installed_flag")
     
+    check_sudo_access()
+
     if args.command == 'start':
         try:
             # Check if dependencies were already installed
