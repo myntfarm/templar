@@ -71,7 +71,7 @@ def install_rust() -> bool:
 
     # Update package lists and install dependencies
 
-    subprocess.run(["apt-get", "update"], check=True, shell=True)
+    subprocess.run(("apt-get update"), check=True, shell=True)
     subprocess.run([
         "apt-get", "install", "-y",
         "cmake", "pkg-config", "libssl-dev", "git",
