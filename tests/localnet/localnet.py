@@ -6,7 +6,6 @@ import yaml
 import sys
 import os
 import shutil
-import torch
 import time
 from math import ceil
 from pathlib import Path
@@ -74,11 +73,6 @@ def install_rust() -> bool:
 
     subprocess.run(("apt-get update"), check=True, shell=True)
     subprocess.run(("apt-get install -y curl cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler "), check=True, shell=True)
-    if torch.cuda.device_count() > 0:
-        try:
-            subprocess.run(("uv pip install cubit"), check=True, shell=True)
-        except:
-            subprocess.run(("pip install cubit"), check=True, shell=True)
     subprocess.run(("curl https://sh.rustup.rs -sSf | sh -s -- -y"), check=True, shell=True)
     subprocess.run(("source \"$HOME/.cargo/env\""), shell=True)
     
