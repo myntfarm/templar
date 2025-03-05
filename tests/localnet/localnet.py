@@ -76,7 +76,7 @@ def install_rust() -> bool:
     subprocess.run(("curl https://sh.rustup.rs -sSf | sh -s -- -y"), check=True, shell=True)
     
     # Configure Rust
-    subprocess.run(("rustup default nightly"), check=True, shell=True)
+    subprocess.run(("rustup default stable"), check=True, shell=True)
     subprocess.run(("rustup update"), check=True, shell=True)
     subprocess.run(("rustup target add wasm32-unknown-unknown"), check=True, shell=True)
     subprocess.run(("rustup toolchain install nightly"), check=True, shell=True)
