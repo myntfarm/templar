@@ -2,7 +2,7 @@
 
 import yaml
 import subprocess
-import torch
+import psutil
 from math import ceil
 from pathlib import Path
 from tplr.logging import logger
@@ -33,7 +33,7 @@ def admin_funding(config: dict, num_calls: int) -> None:
     admin_wallet = open_wallet()["wallet"][0]
     rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
 
-    cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
+    cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --processors {str(ceil(psutil.cpu_count()*80))} --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
     subprocess.run(cmd, shell=True, check=True)
 
 def transfer_funds(rpc_port, wallet_info, amount):
