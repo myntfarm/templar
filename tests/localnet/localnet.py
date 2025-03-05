@@ -79,9 +79,8 @@ def install_rust() -> bool:
     # Configure Rust
     subprocess.run(("rustup default nightly"), check=True, shell=True)
     subprocess.run(("rustup update"), check=True, shell=True)
-    subprocess.run(("rustup target add wasm32-unknown-unknown"), check=True, shell=True)
     subprocess.run(("rustup toolchain install nightly"), check=True, shell=True)
-    subprocess.run(("rustup target add --toolchain nightly wasm32-unknown-unknown"), check=True)
+    subprocess.run(("rustup target add wasm32-unknown-unknown --toolchain nightly"), check=True)
     subprocess.run(("rustup component add rust-src --toolchain nightly"), check=True, shell=True)
 
     logger.info("*** Rust installation complete")
