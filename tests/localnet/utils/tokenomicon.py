@@ -41,7 +41,7 @@ def transfer_funds(rpc_port, wallet_info, amount):
     subprocess.run(cmd, shell=True, check=True)
 
 def register_subnet(wallet_name, hotkey_name, wallet_path, rpc_port):
-    cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \"\" --github-repo \"\" --subnet-contact \"\" --subnet-url \"\" --discord-handle \"\" --description \"\" --additional-info \"\" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
+    cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \" \" --github-repo \" \" --subnet-contact \" \" --subnet-url \" \" --discord-handle \" \" --description \" \" --additional-info \" \" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
     subprocess.run(cmd, shell=True, check=True)
 
 def register_hotkey(wallet_name, hotkey_name, rpc_port):
