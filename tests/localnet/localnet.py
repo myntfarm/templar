@@ -66,6 +66,24 @@ def clone_repos() -> bool:
 
     return True
 
+def fix_rustup_issue_2578():
+    content = """#!/bin/sh
+# rustup shell setup
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+  *:"$HOME/.cargo/bin":*)
+    ;;
+  *)
+    # Prepending path in case a system-installed rustc must be overwritten
+    export PATH="$HOME/.cargo/bin:${PATH}"
+    ;;
+esac"""
+
+    with open(os.path.expanduser("~/.cargo/env"), "w") as f:
+        f.write(content)
+    
+    os.chmod(os.path.expanduser("~/.cargo/env"), 0o755)
+
 def install_rust() -> bool:
     logger.info("*** Installing Rust")
 
@@ -74,6 +92,7 @@ def install_rust() -> bool:
     subprocess.run(("apt-get update"), check=True, shell=True)
     subprocess.run(("apt-get install -y curl cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler"), check=True, shell=True)
     subprocess.run(("curl https://sh.rustup.rs -sSf | sh -s -- -y"), check=True, shell=True)
+    fix_rustup_issue_2578()
     subprocess.run(("source \"$HOME/.cargo/env\""), shell=True)
     
     # Configure Rust
