@@ -94,6 +94,7 @@ def install_rust() -> bool:
     subprocess.run(("curl https://sh.rustup.rs -sSf | sh -s -- -y"), check=True, shell=True)
     fix_rustup_issue_2578()
     subprocess.run(("source \"$HOME/.cargo/env\""), shell=True)
+    subprocess.run(("export CARGO_HOME=\"$HOME/other\""), shell=True)
     
     # Configure Rust
     subprocess.run(("rustup default nightly"), check=True, shell=True)
