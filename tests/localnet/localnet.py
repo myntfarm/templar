@@ -609,7 +609,7 @@ def main():
             # Initialize wallets
             wallet_exsist(args.wallet_path)
             # Begin chain opertions
-            configure_chain()
+            configure_chain(args.wallet_path)
 
         except RuntimeError as e:
             logger.error(f"Error: {str(e)}")

@@ -49,8 +49,8 @@ def register_subnet(wallet_name, hotkey_name, wallet_path, rpc_port):
     cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \"{random_string}\" --github-repo \"https://github.com/opentensor/bittensor\" --subnet-contact \"{random_string}@{random_string}.{random_string}\" --subnet-url \"{random_string}.{random_string}\" --discord-handle \" \" --description \" \" --additional-info \"{random_string}\" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
     subprocess.run(cmd, shell=True, check=True)
 
-def register_hotkey(wallet_name, hotkey_name, rpc_port):
-    cmd = f"btcli subnet register --wallet.name {wallet_name} --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port} -p ./wallets --wallet.hotkey {hotkey_name} --netuid 2 --no-prompt --quiet"
+def register_hotkey(wallet_path, wallet_name, hotkey_name, netuid, rpc_port):
+    cmd = f"btcli subnet register --wallet.name {wallet_name} -p {wallet_path} --wallet.hotkey {hotkey_name} --netuid {str(netuid)} --no-prompt --quiet --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
     subprocess.run(cmd, check=True)
 
 def load_config_and_get_rpc_port() -> tuple:
@@ -98,7 +98,7 @@ def register_subnets(config: dict, wallets: dict,) -> None:
     logger.info("Registering subnet 2 with Validator...")
     register_subnet(validator_wallet.get('wallet_name'), validator_wallet.get('hotkey_name'), Path("./wallets"), rpc_port)
 
-def register_hotkeys(config: dict, wallets: dict) -> None:
+def register_hotkeys(config: dict, wallets: dict, wallet_path: str, netuid: int) -> None:
     """Register hotkeys for Validator and Miners."""
     rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
     
@@ -106,8 +106,10 @@ def register_hotkeys(config: dict, wallets: dict) -> None:
     validator_wallet = wallets['Validators']["wallet"][0]
     logger.info("Registering Validator hotkey to subnet 2...")
     register_hotkey(
-        validator_wallet.get('wallet_name', ''),
-        validator_wallet.get('hotkey_name', 'validator-hotkey'),
+        wallet_path,
+        validator_wallet.get('wallet_name'),
+        validator_wallet.get('hotkey_name'),
+        netuid,
         rpc_port
     )
     
@@ -172,7 +174,7 @@ def stake_tao_for_validator(config: dict, wallets: dict) -> None:
     ]
     subprocess.run(stake_cmd, check=True)
 
-def configure_chain():
+def configure_chain(wallet_path: str):
     """Main function that coordinates all wallet configuration steps."""
     config, rpc_port = load_config_and_get_rpc_port()
     wallets = load_wallet_info()
@@ -185,7 +187,10 @@ def configure_chain():
     
     transfer_initial_funds(wallets, rpc_port)
     register_subnets(config, wallets)
-    register_hotkeys(config, wallets)
+
+    # register all keys to subnet 2
+    netuid = 2
+    register_hotkeys(config, wallets, wallet_path, netuid)
     
     ensure_validator_has_enough_balance(config, wallets)
     stake_tao_for_validator(config, wallets)
