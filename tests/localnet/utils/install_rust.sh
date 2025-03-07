@@ -26,7 +26,7 @@ elif [ "$(uname)" = "Linux" ]; then
     else
         # Ubuntu (and other Debian-based distributions)
         apt-get update
-        apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev
+        apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler
     fi
 else
     echo "Unsupported operating system. Exiting."

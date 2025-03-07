@@ -66,7 +66,7 @@ def generate_new_wallets(wallet_path: str):
             subprocess.run(call, shell=True, check=True)
 
     populate_generated_wallet_yaml(wallet_path)
-
+    wallets = load_wallet_info(wallet_path)
     return wallets
 
 def regenerate_coldkey(name: str, wallet_path: str, coldkey_secretPhrase: str):
