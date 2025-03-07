@@ -553,7 +553,7 @@ def purge_chain_state():
     """purge chain state and cleanup."""
     try:
         logger.info("Killing any existing nodes...")
-        subprocess.run(['pkill', '-9', 'node-subtensor'], check=True)
+        subprocess.run(['pkill', '-9', 'node-subtensor'], shell=True, check=True)
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to kill existing nodes: {e}")
 
@@ -618,7 +618,7 @@ def main():
     elif args.command == 'stop':
         try:
             logger.info("Killing any existing nodes...")
-            subprocess.run(['pkill', '-9', 'node-subtensor'], check=True)
+            subprocess.run(['pkill', '-9', 'node-subtensor'], shell=True, check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to kill existing nodes: {e}")
 

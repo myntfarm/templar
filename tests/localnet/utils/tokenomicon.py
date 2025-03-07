@@ -51,7 +51,7 @@ def register_subnet(wallet_name, hotkey_name, wallet_path, rpc_port):
 
 def register_hotkey(wallet_path, wallet_name, hotkey_name, netuid, rpc_port):
     cmd = f"btcli subnet register --wallet.name {wallet_name} -p {wallet_path} --wallet.hotkey {hotkey_name} --netuid {str(netuid)} --no-prompt --quiet --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, shell=True, check=True)
 
 def load_config_and_get_rpc_port() -> tuple:
     """Load config file and extract RPC port from first authority node."""
