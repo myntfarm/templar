@@ -9,7 +9,7 @@ import shutil
 import time
 from math import ceil
 from pathlib import Path
-from utils.tokenomicon import load_config, admin_funding, transfer_funds, configure_chain
+from utils.tokenomicon import load_config, admin_faucet, admin_transfer_funds, configure_chain
 from tplr.logging import logger
 
 def parse_args():
@@ -557,14 +557,6 @@ def purge_chain_state():
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to kill existing nodes: {e}")
 
-    # Clean up node_pids.json if it exists
-    if os.path.exists('node_pids.json'):
-        try:
-            os.remove('node_pids.json')
-            logger.info("Removed node_pids.json")
-        except Exception as e:
-            logger.error(f"Failed to remove node_pids.json: {e}")
-
     # Reset Chainstate
     basePaths = load_subtensor_config(Path("./subtensor_config.yaml"))
 
@@ -630,9 +622,9 @@ def main():
     elif args.command == 'fund':
         logger.info(f"funding {args.ss58} with {args.amount} Tao...")
         conf = load_config()
-        admin_funding(conf, ceil(args.amount/1000))
         rpc_port = conf['authorityNodes'][0]['subtensor_rpc_port']
-        transfer_funds(rpc_port, args.ss58, args.amount)
+        admin_faucet(args.wallet_path, ceil(args.amount/1000), rpc_port)
+        admin_transfer_funds(rpc_port, args.ss58, args.amount, args.wallet_path)
 
 if __name__ == "__main__":
     main()
