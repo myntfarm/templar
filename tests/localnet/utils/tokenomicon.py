@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import string
 import yaml
+import random
 import subprocess
 from math import ceil
 from pathlib import Path
@@ -41,7 +43,10 @@ def transfer_funds(rpc_port, wallet_info, amount):
     subprocess.run(cmd, shell=True, check=True)
 
 def register_subnet(wallet_name, hotkey_name, wallet_path, rpc_port):
-    cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \" \" --github-repo \"https://github.com/opentensor/bittensor\" --subnet-contact \" \" --subnet-url \" \" --discord-handle \" \" --description \" \" --additional-info \" \" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
+    characters = string.ascii_lowercase
+    random_string = ''.join(random.choices(characters, k=5))
+
+    cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \"{random_string}\" --github-repo \"https://github.com/opentensor/bittensor\" --subnet-contact \"{random_string}@{random_string}.{random_string}\" --subnet-url \"{random_string}.{random_string}\" --discord-handle \" \" --description \" \" --additional-info \"{random_string}\" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
     subprocess.run(cmd, shell=True, check=True)
 
 def register_hotkey(wallet_name, hotkey_name, rpc_port):
