@@ -66,25 +66,7 @@ def clone_repos() -> bool:
     return True
 
 def install_rust() -> bool:
-    logger.info("*** Installing Rust")
-
-    # Update package lists and install dependencies
-
-    subprocess.run(("apt-get update"), check=True, shell=True)
-    subprocess.run(("apt-get install -y curl cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler"), check=True, shell=True)
-    subprocess.run(("curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y"), check=True, shell=True)
-    subprocess.run("./utils/rust_env.sh", shell=True)
-
-    
-    # Configure Rust
-    subprocess.run(("rustup default nightly"), check=True, shell=True)
-    subprocess.run(("rustup update"), check=True, shell=True)
-    subprocess.run(("rustup toolchain install nightly"), check=True, shell=True)
-    subprocess.run(("rustup target add wasm32-unknown-unknown --toolchain nightly"), check=True, shell=True)
-    subprocess.run(("rustup component add rust-src --toolchain nightly"), check=True, shell=True)
-
-    logger.info("*** Rust installation complete")
-
+    subprocess.run("./utils/install_rust.sh", shell=True)
     return True
 
 def install_subnet_template() -> bool:
