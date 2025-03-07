@@ -18,15 +18,14 @@ def parse_args():
 
     # Start command
     start_parser = subparsers.add_parser('start', help='Start the local Subensor network')
-    start_parser.add_argument('--purge', action='store_true',
-                            help='Purge existing chain state and wallets')
     start_parser.add_argument('--wallet-path', type=str, default='./wallets',
                             help='Path to store/read unencrypted wallets')
+    
+    # Stop command
+    stop_parser = subparsers.add_parser('stop', help='Stop all subtensors')
 
     # Purge Local chain
     purge_parser = subparsers.add_parser('purge', help='Stop all subtensors and wipe local chain state')
-    purge_parser.add_argument('--force', action='store_true',
-                            help='Force purge without confirmation')
     
     # Fund command
     fund_parser = subparsers.add_parser('fund', help='Have Admin wallet send Tao to ss58 address')
@@ -65,24 +64,6 @@ def clone_repos() -> bool:
             clone_github_repo(url, destination_path=str(dest_path), branch=repo['branch'])
 
     return True
-
-def fix_rustup_issue_2578():
-    content = """#!/bin/sh
-# rustup shell setup
-# affix colons on either side of $PATH to simplify matching
-case ":${PATH}:" in
-  *:"$HOME/.cargo/bin":*)
-    ;;
-  *)
-    # Prepending path in case a system-installed rustc must be overwritten
-    export PATH="$HOME/.cargo/bin:${PATH}"
-    ;;
-esac"""
-
-    with open(os.path.expanduser("~/.cargo/env"), "w") as f:
-        f.write(content)
-    
-    os.chmod(os.path.expanduser("~/.cargo/env"), 0o755)
 
 def install_rust() -> bool:
     logger.info("*** Installing Rust")
@@ -568,53 +549,37 @@ def launch_subtensor(
     # Launch nodes and track processes
     launch_subtensor_nodes(base_dir, authority_nodes, spec_path)
 
-def manage_chain_state(purge):
-    """Manage chain state and cleanup."""
-    if purge:
-        # Kill any existing nodes
+def purge_chain_state():
+    """purge chain state and cleanup."""
+    try:
+        logger.info("Killing any existing nodes...")
+        subprocess.run(['pkill', '-9', 'node-subtensor'], check=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to kill existing nodes: {e}")
+
+    # Clean up node_pids.json if it exists
+    if os.path.exists('node_pids.json'):
         try:
-            logger.info("Killing any existing nodes...")
-            subprocess.run(['pkill', '-9', 'node-subtensor'], check=True)
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to kill existing nodes: {e}")
+            os.remove('node_pids.json')
+            logger.info("Removed node_pids.json")
+        except Exception as e:
+            logger.error(f"Failed to remove node_pids.json: {e}")
 
-        # Clean up node_pids.json if it exists
-        if os.path.exists('node_pids.json'):
-            try:
-                os.remove('node_pids.json')
-                logger.info("Removed node_pids.json")
-            except Exception as e:
-               logger.error(f"Failed to remove node_pids.json: {e}")
+    # Reset Chainstate
+    basePaths = load_subtensor_config(Path("./subtensor_config.yaml"))
 
-        # Reset Chainstate
-        basePaths = load_subtensor_config(Path("./subtensor_config.yaml"))
-
-        for node in basePaths["authority_nodes"]:
-                chainstate = node.get("base-path")
-                if os.path.exists(chainstate):
-                    # Remove the directory and its contents
-                    shutil.rmtree(chainstate)
-                    logger.info(f"Directory '{chainstate}' has been removed successfully")
-                else:
-                    logger.error(f"The directory '{chainstate}' does not exist")
-
-
-def check_sudo_access():
-    """Check if the script is running with sudo/root privileges."""
-    if os.geteuid() == 0:
-        print("Running as root or with sudo access.")
-        return True
-    else:
-        print("Please run this script as root or using sudo.")
-        sys.exit(1)
-        return False
-
+    for node in basePaths["authority_nodes"]:
+        chainstate = node.get("base-path")
+        if os.path.exists(chainstate):
+            # Remove the directory and its contents
+            shutil.rmtree(chainstate)
+            logger.info(f"Directory '{chainstate}' has been removed successfully")
+        else:
+            logger.error(f"The directory '{chainstate}' does not exist")
 
 def main():
     args = parse_args()
     dependancy_flag_file = Path("./.dependancy_installed_flag")
-    
-    check_sudo_access()
 
     if args.command == 'start':
         try:
@@ -650,12 +615,17 @@ def main():
             logger.error(f"Error: {str(e)}")
             return
 
+    elif args.command == 'stop':
+        try:
+            logger.info("Killing any existing nodes...")
+            subprocess.run(['pkill', '-9', 'node-subtensor'], check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to kill existing nodes: {e}")
+
     elif args.command == 'purge':
         logger.info("Purging Subensor network...")
-        if not args.force:
-            manage_chain_state(True)
-        else:
-            manage_chain_state(True, purge=True)
+        purge_chain_state()
+
 
     elif args.command == 'fund':
         logger.info(f"funding {args.ss58} with {args.amount} Tao...")
