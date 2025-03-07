@@ -92,7 +92,7 @@ def build_binary(base_dir, features):
     """Build substrate binary with specified features."""
     try:
         logger.info("Checking rust install...")
-        with subprocess.Popen("sh install_rust.sh", shell=True) as process:
+        with subprocess.Popen("sh ./utils/install_rust.sh", shell=True) as process:
             process.communicate()
         logger.info("Building substrate binary...")
         build_cmd = f"cargo build --workspace --profile=release --features \"{features}\" --manifest-path ./{base_dir}/Cargo.toml"
