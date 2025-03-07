@@ -4,6 +4,7 @@ import argparse
 import subprocess
 from tplr.logging import logger
 import yaml
+import time
 import shutil
 from pathlib import Path
 from .manage_local_files import load_wallet_info, generate_wallets_yaml
@@ -33,6 +34,7 @@ def populate_generated_wallet_yaml(wallet_path: str):
         yaml.dump(config, f, default_flow_style=False)
 
 def generate_new_wallets(wallet_path: str):
+    wallets = load_wallet_info(wallet_path)
 
     coldkey_calls = []
     hotkey_calls = []
@@ -65,7 +67,7 @@ def generate_new_wallets(wallet_path: str):
             subprocess.run(call, shell=True, check=True)
 
     populate_generated_wallet_yaml(wallet_path)
-    wallets = load_wallet_info(wallet_path)
+
     return wallets
 
 def regenerate_coldkey(name: str, wallet_path: str, coldkey_secretPhrase: str):
@@ -179,6 +181,7 @@ def wallet_exsist(wallet_path: str):
     if not wallets_yaml.exists():
         logger.info("Generating new wallets...")
         generate_wallets_yaml()
+        time.sleep(2)
         generate_new_wallets(wallet_path)
     else:
         logger.info("Checking existing wallets...")
