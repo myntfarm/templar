@@ -4,20 +4,11 @@ import string
 import yaml
 import random
 import subprocess
+import argparse
 from math import ceil
 from pathlib import Path
 from tplr.logging import logger
-
-def load_config():
-    with open(Path("./subtensor_config.yaml"), 'r') as f:
-        config = yaml.safe_load(f)
-    return config
-
-def load_wallet_info(wallet_path: str) -> dict:
-    """Load wallet information from wallets.yaml file."""
-    with open(wallet_path, 'r') as f:
-        wallets = yaml.safe_load(f)
-    return wallets
+from manage_local_files import load_wallet_info, load_config
 
 def get_admin_wallet(wallet_path: str):
     wallets = load_wallet_info(wallet_path)
@@ -137,6 +128,17 @@ def check_wallet_balance(wallet_path: str, wallet_name: str, rpc_port: int, requ
     else:
         return True
 
+def validate_amount(amount):
+    """Validate that amount is a positive float."""
+    try:
+        value = float(amount)
+        if value <= 0:
+            raise ValueError
+        return value
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            "Amount must be a positive floating-point number."
+        )
 
 def stake_tao(wallet_path: str, wallet_name: str, hotkey_name: str, netuid: int, stake_amount: float, rpc_port: int) -> None:
     stake_cmd = (f"btcli stake add --wallet.name={wallet_name} --wallet.hotkey={hotkey_name} --amount={str(stake_amount)} --netuid={netuid} -p={wallet_path} --unsafe --no-prompt --quiet --subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}")
