@@ -14,7 +14,7 @@ def load_wallet_info(wallet_path: str) -> dict:
     return wallets
 
 def load_config():
-    with open(Path("./utils/subtensor_config.yaml"), 'r') as f:
+    with open("./utils/subtensor_config.yaml", 'r') as f:
         config = yaml.safe_load(f)
     return config
 
