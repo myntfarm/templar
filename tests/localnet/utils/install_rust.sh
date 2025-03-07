@@ -9,7 +9,7 @@ fi
 
 echo "*** Installing Rust"
 
-if [[ "$(uname)" == "Darwin" ]]; then
+if [ "$(uname)" == "Darwin" ]; then
     # macOS
     if ! which brew >/dev/null 2>&1; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
@@ -17,7 +17,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     
     brew update
     brew install openssl cmake llvm
-elif [[ "$(uname)" == "Linux" ]]; then
+elif [ "$(uname)" == "Linux" ]; then
     echo "Linux Detected"
     if [[ -f "/etc/arch-release" ]]; then
         # Arch Linux
