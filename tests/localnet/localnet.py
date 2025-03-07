@@ -2,10 +2,11 @@
 
 import argparse
 import subprocess
+import yaml
 from math import ceil
 from pathlib import Path
 from utils.tokenomicon import load_config, admin_faucet, admin_transfer_funds, configure_chain, validate_amount
-from utils.manage_local_files import clone_repos, install_subnet_template
+from utils.manage_local_files import clone_github_repo, install_subnet_template
 from utils.wallet_actions import validate_ss58, wallet_exsist
 from utils.manage_subtensors import purge_chain_state, preflight_subtensor
 from tplr.logging import logger
@@ -33,6 +34,35 @@ def parse_args():
                         help='ss58 address admin wallet will transfer tao too.')
 
     return parser.parse_args()
+
+def clone_repos() -> bool:
+    """Clone git repositories from git_sources.yaml.
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    repo_config = Path("./git_sources.yaml")
+    if not repo_config.exists():
+        logger.error("Error: git_sources.yaml not found")
+        return False
+
+    with open(repo_config, 'r') as f:
+        repos = yaml.safe_load(f)
+
+    for repo in repos:
+        name = repo['repo_name']
+        url = repo['repo_url']
+        dest_path = Path(f"../repo_store/{name}")
+        # Clone the repository
+        logger.info(f"Cloning repository: {name}")
+        if repo.get('release_tag'):
+            # Use tag
+           clone_github_repo(repo_url=url, destination_path=str(dest_path), tag=repo['release_tag'])
+        else:
+            # Use branch
+            clone_github_repo(url, destination_path=str(dest_path), branch=repo['branch'])
+
+    return True
 
 def main():
     args = parse_args()
