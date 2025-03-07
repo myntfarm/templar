@@ -176,7 +176,7 @@ def check_wallets(wallet_path: str) -> bool:
     return True  # All checks passed
 
 def wallet_exsist(wallet_path: str):
-    wallets_yaml = Path('wallets.yaml')
+    wallets_yaml = wallet_path
     if not wallets_yaml.exists():
         logger.info("Generating new wallets...")
         generate_wallets_yaml()
