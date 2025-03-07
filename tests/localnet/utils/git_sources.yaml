@@ -1,8 +1,12 @@
 - repo_name: "subtensor"
   repo_url: "https://github.com/opentensor/subtensor.git"
   release_tag: "v2.0.4"
-  branch: main
+  branch: "main"
 - repo_name: "bittensor-subnet-template"
   repo_url: "https://github.com/opentensor/bittensor-subnet-template.git"
   release_tag: null
-  branch: main
+  branch: "main"
+- repo_name: "cubit"
+  repo_url: "https://github.com/opentensor/cubit.git"
+  release_tag: null
+  branch: "main"

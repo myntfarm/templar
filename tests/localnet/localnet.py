@@ -2,11 +2,13 @@
 
 import argparse
 import subprocess
+import torch.cuda.error
 import yaml
+import torch
 from math import ceil
 from pathlib import Path
 from utils.tokenomicon import load_config, admin_faucet, admin_transfer_funds, configure_chain, validate_amount
-from utils.manage_local_files import clone_github_repo, install_subnet_template
+from utils.manage_local_files import clone_github_repo, install_subnet_template, install_cubit
 from utils.wallet_actions import validate_ss58, wallet_exsist
 from utils.manage_subtensors import purge_chain_state, preflight_subtensor
 from tplr.logging import logger
@@ -79,7 +81,14 @@ def main():
             
                 if not install_subnet_template():
                     raise RuntimeError("Failed to install subnet template")
-            
+                
+                try:
+                    if torch.cuda.device_count > 0:
+                        if not install_subnet_template():
+                            raise RuntimeError("Failed to install cubit")
+                except torch.cuda.error as e:
+                    logger.info("Error calling CUDA devices. skipping cubit install.")
+
                 # Launch Subtensor 
                 preflight_subtensor(base_dir=Path("./repo_store/subtensor"), script_dir=Path("./repo_store/subtensor/scripts") , config_file=Path("./utils/subtensor_config.yaml"))
 

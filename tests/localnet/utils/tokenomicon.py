@@ -4,6 +4,7 @@ import string
 import random
 import subprocess
 import argparse
+import torch
 from math import ceil
 from tplr.logging import logger
 from .manage_local_files import load_wallet_info, load_config
@@ -21,7 +22,8 @@ def calculate_faucet_calls(init_funding: str):
 
 def admin_faucet(wallet_path: str, num_calls: int, rpc_port: int) -> None:
     admin_wallet = get_admin_wallet(wallet_path)
-    cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
+
+    cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --use-cuda --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
     subprocess.run(cmd, shell=True, check=True)
 
 def admin_transfer_funds(rpc_port: int, wallet_info: dict, amount: int, wallet_path:str):

@@ -88,6 +88,17 @@ def install_subnet_template() -> bool:
     subprocess.run(['python', '-m', 'pip', 'install', '-e', str(package_path)], check=True)
     return True
 
+def install_cubit() -> bool:
+    """Install cubit package"""
+    package_path = Path('./repo_store/cubit')
+    if not package_path.exists():
+        logger.error("Error: cubit repo not found")
+        return False
+    
+    logger.info("Installing cubit...")
+    subprocess.run(['python', '-m', 'pip', 'install', '-e', str(package_path)], check=True)
+    return True
+
 def build_binary(base_dir, features):
     """Build substrate binary with specified features."""
     try:
