@@ -13,44 +13,41 @@ def load_config():
         config = yaml.safe_load(f)
     return config
 
-def load_wallet_info() -> dict:
+def load_wallet_info(wallet_path: str) -> dict:
     """Load wallet information from wallets.yaml file."""
-    with open('wallets.yaml', 'r') as f:
+    with open(wallet_path, 'r') as f:
         wallets = yaml.safe_load(f)
     return wallets
 
-def open_wallet():
-    wallets = load_wallet_info()
+def get_admin_wallet(wallet_path: str):
+    wallets = load_wallet_info(wallet_path)
     # Retrieve admin wallet details, defaulting to an empty dictionary if not found
-    admin_wallet = wallets['Admin']
+    admin_wallet = wallets['Admin']["wallet"][0]
     return admin_wallet
 
-def calculate_faucet_calls(init_funding):
+def calculate_faucet_calls(init_funding: str):
     base_amount = init_funding / 1000000000  # Convert to TAO
     calls = (base_amount / 1000) + 3  # Add 3 to ensure enough funds are transferred for fees and subnet registration
     return ceil(calls)
 
-def admin_funding(config: dict, num_calls: int) -> None:
-    admin_wallet = open_wallet()["wallet"][0]
-    rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
-
+def admin_faucet(wallet_path: str, num_calls: int, rpc_port: int) -> None:
+    admin_wallet = get_admin_wallet(wallet_path)
     cmd = f"btcli wallet faucet --wallet.name {admin_wallet.get("wallet_name")} -v -p ./wallets --max-successes {str(num_calls)} --no-prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"       
     subprocess.run(cmd, shell=True, check=True)
 
-def transfer_funds(rpc_port, wallet_info, amount):
-    admin_wallet = open_wallet()
-    cmd = f"btcli wallets transfer --wallet.name {admin_wallet["wallet_name"]} -d {wallet_info["ss58Address"]} -a {amount} --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port} -p ./wallets --no_prompt --quiet"
+def admin_transfer_funds(rpc_port: int, wallet_info: dict, amount: int, wallet_path:str):
+    admin_wallet = get_admin_wallet(wallet_path)
+    cmd = f"btcli wallets transfer --wallet.name {admin_wallet.get("wallet_name")} -d {wallet_info["ss58Address"]} -a {str(amount)} -p {wallet_path} --no_prompt --quiet --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port} "
     subprocess.run(cmd, shell=True, check=True)
 
-def register_subnet(wallet_name, hotkey_name, wallet_path, rpc_port):
+def register_subnet(wallet_name: str, hotkey_name: str, wallet_path: str, rpc_port: int):
     characters = string.ascii_lowercase
     random_string = ''.join(random.choices(characters, k=5))
-
     cmd = f"btcli subnet create --wallet-name {wallet_name} --wallet-hotkey {hotkey_name} -p {wallet_path} --subnet-name \"{random_string}\" --github-repo \"https://github.com/opentensor/bittensor\" --subnet-contact \"{random_string}@{random_string}.{random_string}\" --subnet-url \"{random_string}.{random_string}\" --discord-handle \" \" --description \" \" --additional-info \"{random_string}\" --quiet --no_prompt --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
     subprocess.run(cmd, shell=True, check=True)
 
-def register_hotkey(wallet_path, wallet_name, hotkey_name, netuid, rpc_port):
-    cmd = f"btcli subnet register --wallet.name {wallet_name} -p {wallet_path} --wallet.hotkey {hotkey_name} --netuid {str(netuid)} --no-prompt --quiet --subtensor.chain_endpoint ws://127.0.0.1:{rpc_port}"
+def register_hotkey(wallet_path: str, wallet_name: str, hotkey_name: str, netuid: int, rpc_port: int):
+    cmd = f"btcli subnet register --wallet.name {wallet_name} -p {wallet_path} --wallet.hotkey {hotkey_name} --netuid {str(netuid)} --no-prompt --quiet --subtensor.chain_endpoint ws://127.0.0.1:{str(rpc_port)}"
     subprocess.run(cmd, shell=True, check=True)
 
 def load_config_and_get_rpc_port() -> tuple:
@@ -75,28 +72,28 @@ def calculate_total_initial_funding(wallets: dict) -> float:
         
     return fund
 
-def transfer_initial_funds(wallets: dict, rpc_port: int) -> None:
+def transfer_initial_funds(wallets: dict, wallet_path: str, rpc_port: int) -> None:
     """Transfer initial funds to validators and miners."""
     for wallet_type in ['Validators', 'Miners']:
-        for wallet in wallets.get(wallet_type, []):
+        for wallet in wallets[wallet_type]:
             if 'init_funding' in wallet:
                 amount = int(wallet['init_funding'] / 1000000000)
                 logger.info(f"Transferring {amount} TAO to {wallet['ss58Address']}")
-                transfer_funds(rpc_port, wallet, amount)
+                admin_transfer_funds(rpc_port, wallet, amount, wallet_path)
 
-def register_subnets(config: dict, wallets: dict,) -> None:
+def register_init_subnets(config: dict, wallets: dict, wallet_path: str) -> None:
     """Register subnets for Admin and Validator wallets."""
     rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
     
     # Register subnet with Admin
     admin_wallet = wallets["Admin"]["wallet"][0]
     logger.info("Registering subnet 1 with Admin...")
-    register_subnet(admin_wallet.get('wallet_name'), admin_wallet.get('hotkey_name'), Path("./wallets"), rpc_port)
+    register_subnet(admin_wallet.get('wallet_name'), admin_wallet.get('hotkey_name'), wallet_path, rpc_port)
     
     # Register subnet with Validator
     validator_wallet = wallets['Validators']["wallet"][0]
     logger.info("Registering subnet 2 with Validator...")
-    register_subnet(validator_wallet.get('wallet_name'), validator_wallet.get('hotkey_name'), Path("./wallets"), rpc_port)
+    register_subnet(validator_wallet.get('wallet_name'), validator_wallet.get('hotkey_name'), wallet_path, rpc_port)
 
 def register_hotkeys(config: dict, wallets: dict, wallet_path: str, netuid: int) -> None:
     """Register hotkeys for Validator and Miners."""
@@ -126,71 +123,51 @@ def register_hotkeys(config: dict, wallets: dict, wallet_path: str, netuid: int)
             except Exception as e:
                 logger.error(f"Failed to register miner {miner['ss58Address']}: {str(e)}")
 
-def ensure_validator_has_enough_balance(config: dict, wallets: dict) -> None:
-    """Ensure validator has at least 100 TAO."""
-    validator_wallet = wallets['Validators'][0]
-    rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
+def check_wallet_balance(wallet_path: str, wallet_name: str, rpc_port: int, required_balance: float) -> bool:
     
     # Check balance
-    check_balance_cmd = [
-        'btcli', 'wallet', 'balance',
-        f'--wallet.name={validator_wallet.get("wallet_name")}',
-        f'--subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}'
-    ]
+    check_balance_cmd = (f"btcli wallet balance -p {wallet_path} --wallet.name={wallet_name} --subtensor.chain_endpoint=ws://127.0.0.1:{str(rpc_port)}")
     
     result = subprocess.run(check_balance_cmd, capture_output=True, text=True)
     balance = float(result.stdout.split()[0])
     
-    if balance < 100:
-        logger.info("Validator wallet has less than 100 TAO, adding more funds...")
-        admin_funding(config, 1)  # Add one more faucet call
-        transfer_cmd = [
-            'btcli', 'wallets', 'transfer',
-            f'--wallet.name={validator_wallet.get("wallet_name", "")}',
-            f'-d={validator_wallet.get("ss58Address", "")}',
-            '-a=100',
-            f'--subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}',
-            '--no_prompt',
-            '--quiet'
-        ]
-        subprocess.run(transfer_cmd, check=True)
+    if balance < required_balance:
+        logger.error(f"Wallet has {balance} but needs to have {required_balance}.")
+        return False
+    else:
+        return True
 
-def stake_tao_for_validator(config: dict, wallets: dict) -> None:
-    """Stake 100 TAO for validator on subnet 2."""
-    validator_wallet = wallets.get('Validators', [{}])[0]
-    rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
-    
-    stake_cmd = [
-        'btcli', 'stake', 'add',
-        f'--wallet.name={validator_wallet.get("wallet_name", "")}',
-        f'--wallet.hotkey={validator_wallet.get("hotkey_name", "validator-hotkey")}',
-        f'--subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}',
-        '--amount=100',
-        '--netuid=2',
-        '-p=./wallets',
-        '--unsafe',
-        '--no-prompt',
-        '--quiet'
-    ]
+
+def stake_tao(wallet_path: str, wallet_name: str, hotkey_name: str, netuid: int, stake_amount: float, rpc_port: int) -> None:
+    stake_cmd = (f"btcli stake add --wallet.name={wallet_name} --wallet.hotkey={hotkey_name} --amount={str(stake_amount)} --netuid={netuid} -p={wallet_path} --unsafe --no-prompt --quiet --subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}")
     subprocess.run(stake_cmd, check=True)
 
 def configure_chain(wallet_path: str):
     """Main function that coordinates all wallet configuration steps."""
+
+    # get subtensor config and RPC port for local node
     config, rpc_port = load_config_and_get_rpc_port()
-    wallets = load_wallet_info()
-    
+    # read wallets.yaml
+    wallets = load_wallet_info(wallet_path)
     total_init_funding = calculate_total_initial_funding(wallets)
     num_calls = calculate_faucet_calls(total_init_funding)
     
+    # call chain faucet to admin wallet
     logger.info(f"Calling faucet {num_calls} times...")
-    admin_funding(config, num_calls)
+    admin_faucet(wallet_path, num_calls, rpc_port)
     
-    transfer_initial_funds(wallets, rpc_port)
-    register_subnets(config, wallets)
+    # Send Tao to wallets to fund registrations and stake
+    transfer_initial_funds(wallets, wallet_path, rpc_port)
+
+    # Register subnets 1 & 2
+    register_init_subnets(config, wallets, wallet_path)
 
     # register all keys to subnet 2
     netuid = 2
     register_hotkeys(config, wallets, wallet_path, netuid)
-    
-    ensure_validator_has_enough_balance(config, wallets)
-    stake_tao_for_validator(config, wallets)
+
+    # Have first validator Stake to netui 2
+    vali_wallet = wallets["Validators"]["wallet"][0].get("wallet_name")
+    vali_hotkey = wallets["Validators"]["wallet"][0].get("hotkey_name")
+    vali_stake_netuid = 2
+    stake_tao(wallet_path, vali_wallet, vali_hotkey, vali_stake_netuid, 100, rpc_port)

@@ -397,7 +397,7 @@ def get_hotsecretPhrase(coldname: str, hotname: str, wallet_path: str, ):
     return file["secretPhrase"]
 
 def check_wallets(wallet_path: str) -> bool:
-    wallets_yaml = Path('wallets.yaml')
+    wallets_yaml = wallet_path
     if not wallets_yaml.exists():
         logger.error("Wallets config file not found")
         return False
