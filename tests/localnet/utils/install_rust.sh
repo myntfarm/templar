@@ -18,14 +18,15 @@ if [[ "$(uname)" == "Darwin" ]]; then
     brew update
     brew install openssl cmake llvm
 elif [[ "$(uname)" == "Linux" ]]; then
+    echo "Linux Detected"
     if [[ -f "/etc/arch-release" ]]; then
         # Arch Linux
         sudo pacman -Syu --noconfirm
         sudo pacman -S --noconfirm cmake pkgconf openssl git gcc clang
     else
         # Ubuntu (and other Debian-based distributions)
-        sudo apt-get update
-        sudo apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev
+        apt-get update
+        apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev
     fi
 else
     echo "Unsupported operating system. Exiting."
