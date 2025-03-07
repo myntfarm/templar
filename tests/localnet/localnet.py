@@ -66,7 +66,7 @@ def clone_repos() -> bool:
     return True
 
 def install_rust() -> bool:
-    subprocess.run("./utils/install_rust.sh", shell=True)
+    subprocess.run("./utils/install_rust.sh")
     return True
 
 def install_subnet_template() -> bool:
