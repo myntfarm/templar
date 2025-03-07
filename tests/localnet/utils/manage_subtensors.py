@@ -57,7 +57,7 @@ def preflight_subtensor(
 
     # Load configuration
     config_result = load_config()
-    authority_nodes = config_result["authoritynodes"]
+    authority_nodes = config_result["authorityNodes"]
 
     # Build Binary
     ensure_subtensor_binary(base_dir)
