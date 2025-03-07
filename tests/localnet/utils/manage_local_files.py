@@ -13,7 +13,7 @@ def clone_repos() -> bool:
     Returns:
         bool: True if successful, False otherwise
     """
-    repo_config = Path('git_sources.yaml')
+    repo_config = "./utils/git_sources.yaml"
     if not repo_config.exists():
         logger.error("Error: git_sources.yaml not found")
         return False
@@ -24,7 +24,7 @@ def clone_repos() -> bool:
     for repo in repos:
         name = repo['repo_name']
         url = repo['repo_url']
-        dest_path = Path(f"./repo_store/{name}")
+        dest_path = Path(f"../repo_store/{name}")
         # Clone the repository
         logger.info(f"Cloning repository: {name}")
         if repo.get('release_tag'):

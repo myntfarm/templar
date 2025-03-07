@@ -5,7 +5,6 @@ import random
 import subprocess
 import argparse
 from math import ceil
-from pathlib import Path
 from tplr.logging import logger
 from .manage_local_files import load_wallet_info, load_config
 
