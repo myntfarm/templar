@@ -38,6 +38,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y
 rustup default stable
 
 rustup update nightly
-rustup target add wasm32-unknown-unknown --toolchain nightly
+rustup target add wasm32-unknown-unknown
+rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu
 
 echo "*** Rust installation complete"
