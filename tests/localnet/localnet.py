@@ -83,7 +83,7 @@ def main():
                     raise RuntimeError("Failed to install subnet template")
                 
                 try:
-                    if torch.cuda.device_count > 0:
+                    if torch.cuda.device_count() > 0:
                         if not install_subnet_template():
                             raise RuntimeError("Failed to install cubit")
                 except torch.cuda.error as e:
