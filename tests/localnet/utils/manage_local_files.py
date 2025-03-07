@@ -185,7 +185,7 @@ def ensure_subtensor_binary(base_dir: str) -> str:
         logger.info("Binary not found. Building...")
 
         
-        with open(Path("./subtensor_config.yaml"), 'r') as f:
+        with open(Path("./utils/subtensor_config.yaml"), 'r') as f:
             config = yaml.safe_load(f)
             features = config.get('binaryFeatures')
             build_binary(base_dir, features)
