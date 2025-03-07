@@ -128,13 +128,13 @@ def register_hotkeys(config: dict, wallets: dict, wallet_path: str, netuid: int)
 
 def ensure_validator_has_enough_balance(config: dict, wallets: dict) -> None:
     """Ensure validator has at least 100 TAO."""
-    validator_wallet = wallets.get('Validators', [{}])[0]
+    validator_wallet = wallets['Validators'][0]
     rpc_port = config['authorityNodes'][0]['subtensor_rpc_port']
     
     # Check balance
     check_balance_cmd = [
         'btcli', 'wallet', 'balance',
-        f'--wallet.name={validator_wallet.get("wallet_name", "")}',
+        f'--wallet.name={validator_wallet.get("wallet_name")}',
         f'--subtensor.chain_endpoint=ws://127.0.0.1:{rpc_port}'
     ]
     
