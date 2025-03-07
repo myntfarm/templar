@@ -34,7 +34,7 @@ else
 fi
 
 curl https://sh.rustup.rs -sSf | sh -s -- -y
-source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
 rustup default stable
 
 rustup update nightly
