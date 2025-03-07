@@ -1,3 +1,3 @@
 #!/bin/sh
 
-source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
