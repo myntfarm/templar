@@ -7,7 +7,7 @@ import shutil
 from tplr.logging import logger
 import yaml
 from pathlib import Path
-from manage_local_files import ensure_subtensor_binary, load_config, get_chainspec_path, generate_node_keys_for_authority_nodes
+from .manage_local_files import ensure_subtensor_binary, load_config, get_chainspec_path, generate_node_keys_for_authority_nodes
 
 def load_subtensor_config(config_file: str) -> dict:
     """Load and return Subtensor configuration from YAML file."""
