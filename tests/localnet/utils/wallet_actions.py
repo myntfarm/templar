@@ -6,7 +6,7 @@ from tplr.logging import logger
 import yaml
 import shutil
 from pathlib import Path
-from manage_local_files import load_wallet_info, generate_wallets_yaml
+from .manage_local_files import load_wallet_info, generate_wallets_yaml
 
 def validate_ss58(address):
     """Validate that ss58 is a 48-character alphanumeric string."""
