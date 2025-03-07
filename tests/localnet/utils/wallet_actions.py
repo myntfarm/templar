@@ -33,7 +33,7 @@ def populate_generated_wallet_yaml(wallet_path: str):
         yaml.dump(config, f, default_flow_style=False)
 
 def generate_new_wallets(wallet_path: str):
-    wallets = load_wallet_info()
+    wallets = load_wallet_info(wallet_path)
 
     coldkey_calls = []
     hotkey_calls = []
