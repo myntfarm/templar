@@ -84,7 +84,7 @@ def purge_chain_state():
         logger.error(f"Failed to kill existing nodes: {e}")
 
     # Reset Chainstate
-    basePaths = load_subtensor_config(Path("./subtensor_config.yaml"))
+    basePaths = load_subtensor_config(Path("./utils/subtensor_config.yaml"))
 
     for node in basePaths["authority_nodes"]:
         chainstate = node.get("base-path")
