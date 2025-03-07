@@ -9,4 +9,4 @@
 - repo_name: "cubit"
   repo_url: "https://github.com/opentensor/cubit.git"
   release_tag: null
-  branch: "main"
+  branch: "master"
