@@ -54,7 +54,7 @@ def clone_repos() -> bool:
     for repo in repos:
         name = repo['repo_name']
         url = repo['repo_url']
-        dest_path = Path(f"../repo_store/{name}")
+        dest_path = Path(f"./repo_store/{name}")
         # Clone the repository
         logger.info(f"Cloning repository: {name}")
         if repo.get('release_tag'):
