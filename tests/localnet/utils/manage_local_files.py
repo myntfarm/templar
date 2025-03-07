@@ -7,35 +7,6 @@ from tplr.logging import logger
 import yaml
 from pathlib import Path
 
-def clone_repos() -> bool:
-    """Clone git repositories from git_sources.yaml.
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    repo_config = Path("./git_sources.yaml")
-    if not repo_config.exists():
-        logger.error("Error: git_sources.yaml not found")
-        return False
-
-    with open(repo_config, 'r') as f:
-        repos = yaml.safe_load(f)
-
-    for repo in repos:
-        name = repo['repo_name']
-        url = repo['repo_url']
-        dest_path = Path(f"../repo_store/{name}")
-        # Clone the repository
-        logger.info(f"Cloning repository: {name}")
-        if repo.get('release_tag'):
-            # Use tag
-           clone_github_repo(repo_url=url, destination_path=str(dest_path), tag=repo['release_tag'])
-        else:
-            # Use branch
-            clone_github_repo(url, destination_path=str(dest_path), branch=repo['branch'])
-
-    return True
-
 def load_wallet_info(wallet_path: str) -> dict:
     """Load wallet information from wallets.yaml file."""
     with open(wallet_path, 'r') as f:

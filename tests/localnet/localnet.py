@@ -41,7 +41,7 @@ def clone_repos() -> bool:
     Returns:
         bool: True if successful, False otherwise
     """
-    repo_config = Path("./git_sources.yaml")
+    repo_config = Path("./utils/git_sources.yaml")
     if not repo_config.exists():
         logger.error("Error: git_sources.yaml not found")
         return False
