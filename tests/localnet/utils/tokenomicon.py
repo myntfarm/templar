@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 import string
-import yaml
 import random
 import subprocess
 import argparse
 from math import ceil
 from pathlib import Path
 from tplr.logging import logger
-from manage_local_files import load_wallet_info, load_config
+from utils.manage_local_files import load_wallet_info, load_config
 
 def get_admin_wallet(wallet_path: str):
     wallets = load_wallet_info(wallet_path)
