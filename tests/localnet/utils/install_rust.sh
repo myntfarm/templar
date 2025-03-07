@@ -17,7 +17,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     
     brew update
     brew install openssl cmake llvm
-    elif [[ "$(uname)" == "Linux" ]]; then
+elif [[ "$(uname)" == "Linux" ]]; then
     if [[ -f "/etc/arch-release" ]]; then
         # Arch Linux
         sudo pacman -Syu --noconfirm
